@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>표정 분석</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.0.min.js"></script>
+    <script src="https://docs.opencv.org/3.4/opencv.js"></script>
+
+    <style>
+        @keyframes signal-ani {
+            from {
+                transform: translate(-200px, 0);
+            }
+
+            to {
+                transform: translate(200px, 0px);
+            }
+        }
+
+        @font-face {
+            font-family: 'GongGothicBold';
+            src: local('GongGothicBold'),
+            url('{% static 'fonts/GongGothicBold.ttf' %}') format("truetype");
+        }
+
+        @font-face {
+            font-family: 'GongGothicLight';
+            src: local('GongGothicLight'),
+            url('{% static 'fonts/GongGothicLight.ttf' %}') format("truetype");
+        }
+
+        @font-face {
+            font-family: 'GongGothicMedium';
+            src: local('GongGothicMedium'),
+            url('{% static 'fonts/GongGothicMedium.ttf' %}') format("truetype");
+        }
+
+        body {
+            background-image: url({% static 'src/background.png' %});
+            background-size: cover;
+        }
+
+        .section {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .backbtn {
+            position: absolute;
+            top: 25px;
+            left: 35px;
+        }
+
+        .youtube {
+            border-radius: 10px;
+            position: relative;
+            width: 50vw;
+            height: 60vh;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-family: 'GongGothicBold';
+            margin-bottom: 0px;
+        }
+
+        h4 {
+            font-family: "GongGothicLight";
+            font-weight: lighter;
+            font-size: 16px;
+            text-align: center;
+            padding-bottom: 10px;
+        }
+
+        div a {
+            text-decoration: none;
+            border-radius: 32px;
+            background-color: #0979ea;
+            padding: 14px 25px;
+            font-family: GongGothicMedium;
+            font-size: 15px;
+            color: white;
+        }
+
+        a:hover {
+            background-color: #0e376f;
+        }
+        .loading{
+            width:100%;
+            height:100%;
+            position:fixed;
+            left:0px;
+            top:0px;
+            background:#fff;
+            z-index:1000;
+        }
+        p {
+            font-family : "GongGothic_M" ;
+            font-size : 12px;
+            color: white;
+            text-align: center;
+        }
+        .loading {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: rgb(34, 34, 34);
+            z-index: 1000;
+        }
+        .signal {
+            position: relative;
+            animation: signal-ani 10s linear infinite;
+        }
+        .character {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body style="width: 100vw; height: 100vh; overflow: hidden;">
+{#    <div class="loading">#}
+{#        <div class="loading_box">#}
+{#            <div class="signal">#}
+{#                <img src="{% static 'src/signal_white.png' %}">#}
+{#            </div>#}
+{#            <div class="character">#}
+{#                <p>시그널<br> 수신중이라는데?</p>#}
+{#                <img src="{% static 'src/signal.png' %}" height="100px" width="300px">#}
+{#                <p>악 기대돼❤</p>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+    <a href={% url 'main' %}>
+        <img class="backbtn" src="{% static 'src/back.png' %}" width="30" height="30" />
+    </a>
+    <div class="section">
+        {% csrf_token %}
+        <h1>웃음 참기 챌린지</h1>
+        <h4>
+            <b>SIGNAL</b> 팀이 개발한 감성분석 엔진으로, 당신이 웃음을 참는지 날카롭게 지켜볼게요 😏<br>
+            편하게 영상을 즐겨주세요 !
+        </h4>
+        <iframe class='youtube' src="https://www.youtube.com/embed/g0P2m3t3Sr0" frameborder="0"
+            allowfullscreen></iframe>
+        <div>
+            <a class='button' style="cursor: pointer;">당신의 웃음 참기 능력치는 ?</a>
+        </div>
+    </div>
+
+    <video id="videoInput" style="visibility: hidden"></video>
+    <canvas id="canvasOutput" style="visibility: hidden"></canvas>
+
+    <script>
+        $('.button').on('click', function(e) {
+            $.ajax({
+                type: "POST",
+                url: "{% url 'analysis_result' %}",
+                data: {'count': count},
+                success: function (response) {
+                    $('body').html(response);
+                    $('head').remove();
+                    $('script').remove();
+                }
+            })
+        });
+    </script>
+    <script type="text/javascript" src="{% static 'js/emotion_analysis.js' %}"></script>
+
+</body>
+</html>
